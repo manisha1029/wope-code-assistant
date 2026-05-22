@@ -1,5 +1,5 @@
 import httpx
-from app.config import config
+from app.config.config import config
 
 # Step 1: URL to send user to GitHub login
 async def get_github_login_url():
