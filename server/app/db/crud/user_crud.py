@@ -9,6 +9,7 @@ async def get_user_by_github_id(github_id: int):
 
 async def create_user(user: User):
     async with AsyncSessionLocal() as session:
+        print("this is user ",user)
         session.add(user)
         await session.commit()
         return user

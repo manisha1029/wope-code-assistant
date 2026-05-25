@@ -32,4 +32,21 @@ async def get_github_user(token: str):
             "https://api.github.com/user",
             headers={"Authorization": f"Bearer {token}"},
         )
-    return response.json()  # contains id, login, email, avatar_url
+    return response.json()
+
+async def fetch_github_repos(access_token: str):
+    """Calls GitHub API and returns list of repos"""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://api.github.com/user/repos",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/vnd.github+json"
+            },
+            params={
+                "per_page": 100,    # fetch up to 100 repos
+                "sort": "updated",  # most recently updated first
+                "type": "all"       # include private + public
+            }
+        )
+    return response.json()

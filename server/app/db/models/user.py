@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.db import Base
 from datetime import datetime, timezone
 
@@ -17,4 +17,7 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
         onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+    repositories: Mapped[list["Repository"]] = relationship(
+        "Repository", back_populates="owner"
     )

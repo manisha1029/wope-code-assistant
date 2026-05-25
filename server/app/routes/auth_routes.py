@@ -1,10 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import RedirectResponse
-from app.auth.github_oauth import (
-    get_github_login_url,
-    exchange_code_for_token,
-    get_github_user,
-)
+from app.auth.github_oauth import get_github_login_url
+from app.services.auth_service import handle_github_login_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -17,21 +14,15 @@ async def github_login():
 
 # Route 2: GitHub redirects back here with a "code"
 @router.get("/github/callback")
-async def github_callback(code:str):
-     # Exchange code for token
-    token_data = await exchange_code_for_token(code)
-    access_token = token_data.get("access_token")
-
-    if not access_token:
-        return {"error": "Failed to get access token"}
-
-    # Get GitHub user
-    user_data = await get_github_user(access_token)
-
+async def github_callback(code: str):
+    user, error = await handle_github_login_service(code)
+    if error: 
+        raise HTTPException(status_code=400, detail=error) 
+    
     return {
         "message": "Login successful!",
-        "github_username": user_data.get("login"),
-        "github_id": user_data.get("id"),
-        "avatar": user_data.get("avatar_url"),
-        "access_token": access_token  # later store this in DB, don't return it
+        "github_id": user.github_id,
+        "email": user.email,
+        "avatar": user.avatar_url,
+        "access_token": user.access_token
     }
