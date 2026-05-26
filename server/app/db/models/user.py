@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.db import Base
 from datetime import datetime, timezone
-
 from app.auth.encyption import EncryptedString
 
 class User(Base):
