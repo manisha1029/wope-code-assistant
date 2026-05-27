@@ -2,10 +2,10 @@ import httpx
 from app.config.config import config
 
 # Step 1: URL to send user to GitHub login
-async def get_github_login_url():
+def get_github_login_url():
     return (
         f"https://github.com/login/oauth/authorize"
-        f"?client_id={config.GITHUB_CLIENT_ID}"
+        f"?client_id={config.GITHUB_CLIENT_ID}" 
         f"&redirect_uri={config.GITHUB_REDIRECT_URI}"
         f"&scope=repo user"
     )

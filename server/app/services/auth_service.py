@@ -1,6 +1,7 @@
 from app.auth.github_oauth import exchange_code_for_token, get_github_user
 from app.db.crud.user_crud import get_user_by_github_id, create_user, update_user
 from app.db.models.user import User
+from app.auth.jwt_handler import create_access_token
 
 async def handle_github_login_service(code: str):
     # Step 1: Exchange code for token
@@ -8,12 +9,12 @@ async def handle_github_login_service(code: str):
     access_token = token_data.get("access_token")
 
     if not access_token:
-        return None, "Failed to get access token from GitHub"
+        return None, None, "Failed to get access token from GitHub"
 
     # Step 2: Get GitHub user info
     user_data = await get_github_user(access_token)
     if not user_data or "id" not in user_data:
-        return None, "Failed to get user info from GitHub"
+        return None, None, "Failed to get user info from GitHub"
 
     # Step 3: Prepare user fields
     github_id  = user_data["id"]
@@ -37,4 +38,10 @@ async def handle_github_login_service(code: str):
         )
         user = await create_user(new_user)
 
-    return user, None
+    # step 5 : generate jwt token 
+    jwt_token = create_access_token({
+        "user_id":   user.id,
+        "github_id": user.github_id,
+    })
+
+    return user, jwt_token, None   
