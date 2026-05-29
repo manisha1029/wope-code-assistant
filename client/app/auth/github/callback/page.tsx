@@ -3,28 +3,36 @@
 import { useSearchParams } from "next/navigation"
 import { useEffect } from "react";
 import { useLoginCallback } from "@/hooks/useLoginCallback";
+import { useRouter } from "next/navigation";
 
 
-function page() {
+function GithubLogin() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const {data, isLoading, isError} = useLoginCallback(searchParams.get('code') || '');
+  const code = searchParams.get('code');
+  const {data, isLoading, isError} = useLoginCallback(code || '');
 
   useEffect(() => {
+    if(!code){
+      router.replace("/")
+    }
     if(data){
         localStorage.setItem('jwt_token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        window.location.href = '/dashboard';
+        router.replace("/dashboard")
     }
     if(isError){
-        window.location.href = '/';
+        router.replace('/');
     }
-  },[data, isError])
-    
-  
+  },[code, data, isError, router])
     
   return (
-    <div className="flex justify-center items-center h-screen">Plase wait while we are signing you in....</div>
+   isLoading ? 
+   <div className="flex justify-center items-center h-screen">
+      Plase wait while we are signing you in....
+   </div> 
+   : null
   )
 }
 
-export default page
+export default GithubLogin;

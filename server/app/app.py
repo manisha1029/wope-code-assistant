@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import auth_routes, repo_routes
+from app.routes import auth_routes, repo_routes, user_routes
 
 app = FastAPI(
     title="Wope Code Assistant",
@@ -22,6 +22,7 @@ app.add_middleware(
 
 app.include_router(auth_routes.router)
 app.include_router(repo_routes.router)
+app.include_router(user_routes.router)
 
 @app.get("/")
 def health_check():
